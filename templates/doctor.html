@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+  <h1>Welcome {{data.first_name}} {{data.last_name}}!</h1>
+  <h1>{{appData}}</h1>
+  <a href="/logout" class="btn btn-primary btn-lg">Logout</a>
+
+
+<!-- code to display doctor basic details -->
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Doctor Details</h5>
+      <p class="card-text">Doctor ID: {{data.doc_id}}</p>
+      <p class="card-text">Specialization: {{data.specialization}}</p>
+      <p class="card-text">First Name: {{data.first_name}}</p>
+      <p class="card-text">Last Name: {{data.last_name}}</p>
+      <p class="card-text">Email: {{data.email}}</p>
+      <p class="card-text">Phone: {{data.phone}}</p>
+      <p class="card-text">Address: {{addr.street_name}}</p>
+      <p class="card-text">City: {{addr.city}}</p>
+      <p class="card-text">State: {{addr.state}}</p>
+      <p class="card-text">Zip: {{addr.zip}}</p> 
+      <p class="card-text">Joining Date: {{data.joining_date}}</p>
+      <p class="card-text">Date of Birth: {{data.dob}}</p>
+      <p class="card-text">Sex: {{data.sex}}</p>
+      <p class="card-text">SSN: {{data.ssn}}</p>
+    </div>
+  </div>
+
+  <div id="calendar">
+
+      <script type="text/javascript">
+        let calendarEl = document.getElementById('calendar');
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          events: [
+            {% for event in events %}
+            {
+              title: '{{event.title}} {{event.id}}',
+              start: '{{event.start}}',
+              end: '{{event.end}}',
+              color: '{{event.color}}'
+            },
+            {% endfor %}
+          ]
+        });
+        calendar.render();
+      </script>
+  </div>
+{% endblock %}

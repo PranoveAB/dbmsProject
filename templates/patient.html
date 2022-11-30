@@ -1,0 +1,119 @@
+<!-- Create a dashboard for a patient where the page should display welcome username and a logout button. 
+Implement a navbar for the dashboard. -->
+
+
+<!-- Path: dbmsProject\templates\patient.html -->
+
+{% extends 'layout.html' %}
+
+{% block body %}
+{% from "includes/_formhelpers.html" import render_field %}
+<script type="text/javascript">
+    editDetails = function() {
+        document.getElementById("policy_no").disabled = false;
+        document.getElementById("company_name").disabled = false;
+        document.getElementById("sum_insured").disabled = false;
+        document.getElementById("policy_start_date").disabled = false;
+        document.getElementById("policy_end_date").disabled = false;
+        document.getElementById("updateInsurance").style.visibility = "visible";
+        document.getElementById("CancelUpdate").style.visibility = "visible";  
+        
+    }
+
+    cancelUpdate = function() {      
+        document.getElementById("policy_no").disabled = true;
+        document.getElementById("company_name").disabled = true;
+        document.getElementById("sum_insured").disabled = true;
+        document.getElementById("policy_start_date").disabled = true;
+        document.getElementById("policy_end_date").disabled = true;
+        document.getElementById("updateInsurance").style.visibility = "hidden";
+        document.getElementById("CancelUpdate").style.visibility = "hidden";
+        
+        
+    }
+
+</script>
+  <h1>Welcome {{patientData.patient_first_name}} {{patientData.patient_last_name}}!</h1>
+
+  <!-- code to display patient basic details -->
+
+   <div class = "float-container">
+    <div class="levelone">
+        <div class = "float-child">
+            <h2>Patient Details</h2>
+            <p>Patient ID: {{patientData.mrn}}</p>
+            <p>First Name: {{patientData.patient_first_name}}</p>
+            <p>Last Name: {{patientData.patient_last_name}}</p>
+            <p>Email: {{patientData.patient_email}}</p>
+            <p>Phone: {{patientData.patient_phone}}</p>
+            <p>Date of Birth: {{patientData.patient_dob}}</p>
+            <p>Sex: {{patientData.sex}}</p>
+            <p>Blood Group: {{patientData.blood_group}}</p>
+    </div>
+        <div class = "float-child">
+            <h2>Residential Address</h2>
+            <p>Address: {{patientData.street_name}}</p>
+            <p>City: {{patientData.city}}</p>
+            <p>State: {{patientData.state}}</p>
+            <p>Zip: {{patientData.zip}}</p>
+        </div>
+    </div>
+    
+    <div class = "float-child">
+        <h2>Medical History Details</h2>
+        <p>Description: {{patientData.Med_rec_des}}</p>
+        <p>Allergies: {{patientData.allergy}}</p>
+        <p>Next Follow Up: {{patientData.follow_up}}</p>
+    </div>
+
+    <div class = "float-child">
+        <form method="POST" action="/patient">
+            <h2>Insurance Details <button type="button" class="btn btn-primary" onclick="editDetails()">Edit</button></h2>
+            <div class="form-group">{{render_field(form.policy_no,disabled="disabled", extra_classes="ourClasses")}}</div>
+            <div class="form-group">{{render_field(form.company_name,disabled="disabled")}}</div>
+            <div class="form-group">{{render_field(form.sum_insured, disabled="disabled")}}</div>
+            <div class="form-group">{{render_field(form.policy_start_date, disabled="disabled")}}</div>
+            <div class="form-group">{{render_field(form.policy_end_date, disabled="disabled")}}</div>
+            <button type="submit" class="btn btn-primary" style="visibility: hidden;" id="updateInsurance">Update</button>
+            <button type="button" class="btn btn-primary" style="visibility: hidden;" id="CancelUpdate" onclick="cancelUpdate()">Cancel</button>
+        </form>
+
+    </div>
+
+    </div>
+    
+    <style type="text/css">
+        .levelone
+        {
+            display: flex;
+            flex-direction: row;   
+        }
+        .float-container {
+            border: 3px solid #fff;
+            padding: 20px;
+        }
+        
+        .float-child {
+            width: 50%;
+            float: left;
+            padding: 10px;
+            
+        }
+        label {
+            font-weight: normal;
+        }
+        /* .after{
+            background-color: purple;
+        }
+        .deo{
+            border: none;
+            border-color: black;
+            background-color: #fff;
+        } */
+        </style>
+        
+   
+  {% endblock %}
+
+
+
