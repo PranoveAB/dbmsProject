@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+  <h1>Welcome {{data.first_name}} {{data.last_name}}!</h1>
+
+<!-- code to display doctor basic details -->
+
+    <div class = "float-container">
+        <div class="levelone">
+            <div class = "float-child">
+                <h2>Doctor Details</h2>
+                <p>Doctor ID: {{data.doc_id}}</p>
+                <p>First Name: {{data.first_name}}</p>
+                <p>Last Name: {{data.last_name}}</p>
+                <p>Email: {{data.email}}</p>
+                <p>Phone: {{data.phone}}</p>
+                <p>Specialization: {{data.specialization}}</p>
+            </div>
+            <div class = "float-child">
+                <h2>Residential Address</h2>
+                <p>Address: {{addr.street_name}}</p>
+                <p>City: {{addr.city}}</p>
+                <p>State: {{addr.state}}</p>
+                <p>Zip: {{addr.zip}}</p>
+            </div>
+        </div>
+    </div>
+
+  <h1>My Appointments</h1>
+  <div id="calendar">
+      <script type="text/javascript">
+        let calendarEl = document.getElementById('calendar');
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          events: [
+            {% for event in events %}
+            {
+              title: '{{event.title}} {{event.id}}',
+              start: '{{event.start}}',
+              end: '{{event.end}}',
+              color: '{{event.color}}'
+            },
+            {% endfor %}
+          ]
+        });
+        calendar.render();
+      </script>
+  </div>
+
+  <style>
+    .float-container {
+      overflow: hidden;
+    }
+    .float-child {
+      float: left;
+      width: 50%;
+      padding: 10px;
+    }
+    .levelone {
+      width: 100%;
+    }
+  </style>
+
+{% endblock %}

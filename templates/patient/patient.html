@@ -1,0 +1,283 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+{% from "includes/_formhelpers.html" import render_field %}
+<script type="text/javascript">
+    editDetails = function() {
+        document.getElementById("policy_no").disabled = false;
+        document.getElementById("company_name").disabled = false;
+        document.getElementById("sum_insured").disabled = false;
+        document.getElementById("policy_start_date").disabled = false;
+        document.getElementById("policy_end_date").disabled = false;
+        document.getElementById("updateInsurance").style.visibility = "visible";
+        document.getElementById("CancelUpdate").style.visibility = "visible";    
+    }
+
+    cancelUpdate = function() {      
+        document.getElementById("policy_no").disabled = true;
+        document.getElementById("company_name").disabled = true;
+        document.getElementById("sum_insured").disabled = true;
+        document.getElementById("policy_start_date").disabled = true;
+        document.getElementById("policy_end_date").disabled = true;
+        document.getElementById("updateInsurance").style.visibility = "hidden";
+        document.getElementById("CancelUpdate").style.visibility = "hidden";
+    }
+
+
+
+    editMedHistory = function() {
+        document.getElementById("description").disabled = false;
+        document.getElementById("allergies").disabled = false;
+        document.getElementById("nextFollowUp").disabled = false;
+        document.getElementById("diagnosis").disabled = false;
+        document.getElementById("treatmentName").disabled = false;
+        document.getElementById("treatmentDescription").disabled = false;
+        document.getElementById("updateMedHistory").style.visibility = "visible";
+        document.getElementById("cancelMedhistory").style.visibility = "visible";    
+    }
+
+    cancelMedHistory = function() {      
+        document.getElementById("description").disabled = true;
+        document.getElementById("allergies").disabled = true;
+        document.getElementById("nextFollowUp").disabled = true;
+        document.getElementById("updateMedHistory").style.visibility = "hidden";
+        document.getElementById("cancelMedhistory").style.visibility = "hidden";
+        document.getElementById("diagnosis").disabled = true;
+        document.getElementById("treatmentName").disabled = true;
+        document.getElementById("treatmentDescription").disabled = true;
+    }
+
+    submitForm = function() {
+        document.getElementById('form1').submit();
+        document.getElementById('form2').submit();
+        document.getElementById('form3').submit();
+
+    }
+
+
+</script>
+{%if session.user_role == 'patient'%}
+  <h1>Welcome {{patientData.patient_first_name}} {{patientData.patient_last_name}}!</h1>
+  <a href="/add" class="btn btn-primary btn-lg">Create Appointment</a>
+{%endif%}
+  <!-- code to display patient basic details -->
+
+   <div class = "float-container">
+    <div class="levelone">
+        <div class = "float-child">
+            <h2>Patient Details</h2>
+            <p>Patient ID: {{patientData.mrn}}</p>
+            <p>First Name: {{patientData.patient_first_name}}</p>
+            <p>Last Name: {{patientData.patient_last_name}}</p>
+            <p>Email: {{patientData.patient_email}}</p>
+            <p>Phone: {{patientData.patient_phone}}</p>
+            <p>Date of Birth: {{patientData.patient_dob}}</p>
+            <p>Sex: {{patientData.sex}}</p>
+            <p>Blood Group: {{patientData.blood_group}}</p>
+    </div>
+        <div class = "float-child">
+            <h2>Residential Address</h2>
+            <p>Address: {{patientData.street_name}}</p>
+            <p>City: {{patientData.city}}</p>
+            <p>State: {{patientData.state}}</p>
+            <p>Zip: {{patientData.zip}}</p>
+        </div>
+    </div>
+
+    <div class="float-child">
+        {%if session.user_role == 'patient'%}
+        <h2>Bill Details</h2>
+        <p>Bill Date: {{patientData.bill_date}}</p>
+        <p>Bill Amount: {{patientData.total_cost}}</p>
+        {%endif%}
+    </div>
+
+    <div class="float-child">
+        {%if session.user_role == 'patient'%}
+        <h2>Payment Details</h2>
+        <p>Payment Date: {{patientData.payment_date}}</p>
+        <p>Payment Status: {{patientData.payment_status}}</p>
+        <p>Payment Method: {{patientData.payment_method}}</p>
+        {%endif%}
+    </div>
+    
+    {%if session.user_role == 'patient'%}
+    <div class = "float-child">
+        <h2>Medical History Details</h2>
+        <p>Description: {{patientData.Med_rec_des}}</p>
+        <p>Allergies: {{patientData.allergy}}</p>
+        <p>Next Follow Up: {{patientData.follow_up}}</p>
+    </div>
+
+    <div class = "float-child">
+        <h2>Diagnosis and Treatments</h2>
+        <p>Diagnosis: {{patientData.diag_desc}}</p>
+        <p>Treatment Name: {{patientData.treat_name}}</p>
+        <p>Treatment Description: {{patientData.treat_desc}}</p>
+    </div>
+
+    <div class="float-child">
+        <h2>Medications</h2>
+        <p>Description: {{patientData.med_description}}</p>
+        <p>Medication Dosage: {{patientData.dosage}}</p>
+        <p>Medication Frequency: {{patientData.frequency}}</p>
+        <p>Medication Duration: {{patientData.duration}}</p>
+        <p>Refill: {{patientData.refill}}</p>
+        <p>Cost: {{patientData.med_cost}}</p>
+    </div>
+
+    {%endif%}
+
+
+    
+
+    <div class = "float-child">
+        {% if session.user_role == 'patient'%}
+        <form method="POST" action="/patient">
+            <h2>Insurance Details <button type="button" class="btn btn-primary" onclick="editDetails()">Edit</button></h2>
+            <div class="form-group">{{render_field(form.policy_no,disabled="disabled", extra_classes="ourClasses")}}</div>
+            <div class="form-group">{{render_field(form.company_name,disabled="disabled")}}</div>
+            <div class="form-group">{{render_field(form.sum_insured, disabled="disabled")}}</div>
+            <div class="form-group">{{render_field(form.policy_start_date, disabled="disabled")}}</div>
+            <div class="form-group">{{render_field(form.policy_end_date, disabled="disabled")}}</div>
+            <button type="submit" class="btn btn-primary" style="visibility: hidden;" id="updateInsurance">Update</button>
+            <button type="button" class="btn btn-primary" style="visibility: hidden;" id="CancelUpdate" onclick="cancelUpdate()">Cancel</button>
+        </form>
+        {%endif%}
+
+        {% if session.user_role == 'doctor' or session.user_role == 'admin'%}
+        <h2>Insurance Details</h2>
+        <p>Policy Number: {{patientData.policy_no}}</p>
+        <p>Company Name: {{patientData.company_name}}</p>
+        <p>Sum Insured: {{patientData.sum_insured}}</p>
+        <p>Policy Start Date: {{patientData.policy_start_date}}</p>
+        {%endif%}
+    </div>
+
+
+
+
+    <div class="float-child">
+        {%if session.user_role == 'admin'%}
+        <h2>Bill Details</h2>
+        <form method="POST" action="/patient/{{patientData.mrn}}">
+            <div class="form-group">{{render_field(patientBill.billDate)}}</div>
+            <div class="form-group">{{render_field(patientBill.billAmount)}}</div>
+            <button type="submit" class="btn btn-primary" id="updateBill">Update</button>
+        </form>
+        {%endif%}
+    </div>
+
+    <div class="float-child">
+        {%if session.user_role == 'admin'%}
+        <h2>Payment Details</h2>
+        <form method="POST" action="/patient/{{patientData.mrn}}" id="form5">
+            <div class="form-group">{{render_field(patientPayment.paymentDate)}}</div>
+            <div class="form-group">{{render_field(patientPayment.paymentStatus)}}</div>
+            <div class="form-group">{{render_field(patientPayment.paymentMethod)}}</div>
+            <button type="submit" class="btn btn-primary" id="updatePayment">Update</button>
+        </form>
+        {%endif%}
+    </div>
+
+    
+    <div class = "float-child">
+        {% if session.user_role == 'doctor'%}
+        <form method="POST" action="/patient/{{patientData.mrn}}" id="form1">
+            <h2>Medical History Details</h2>
+            <div class="form-group">{{render_field(medicalRecord.description, extra_classes="ourClasses")}}</div>
+            <div class="form-group">{{render_field(medicalRecord.allergies)}}</div>
+            <div class="form-group">{{render_field(medicalRecord.nextFollowUp)}}</div>
+            <button type="submit" class="btn btn-primary" id="updateMedHistory" onclick="submitForm()">Update</button>
+        </form>
+        {%endif%}
+    </div>
+
+    <div class="floar-child">
+        {% if session.user_role == 'doctor'%}
+        <h2>Medical Treatment Details</h2>
+        <form method="POST" action="/patient/{{patientData.mrn}}" id="form2">
+            <div class="form-group">{{render_field(treatment.diagnosis)}}</div>
+            <div class="form-group">{{render_field(treatment.treatmentName)}}</div>
+            <div class="form-group">{{render_field(treatment.treatmentDescription)}}</div>
+            <button type="submit" class="btn btn-primary" id="updateTreatment">Update</button>
+        </form>
+        {%endif%}
+    </div>
+
+    <div class="floar-child">
+        {% if session.user_role == 'doctor'%}
+        <form method="POST" action="/patient/{{patientData.mrn}}" id="form3">
+            <h2>Medication Details</h2>
+            <div class="form-group">{{render_field(medication.medicationName)}}</div>
+            <div class="form-group">{{render_field(medication.medicationDosage)}}</div>
+            <div class="form-group">{{render_field(medication.medicationFrequency)}}</div>
+            <div class="form-group">{{render_field(medication.medicationDuration)}}</div>
+            <div class="form-group">{{render_field(medication.refills)}}</div>
+            <div class="form-group">{{render_field(medication.medicationCost)}}</div>
+            <button type="submit" class="btn btn-primary" id="updateMedHistory">Update</button>
+        </form>
+        {%endif%}
+    </div>
+
+
+    {% if session.user_role == 'patient'%}
+    <div id="calendar" class="class-calendar">
+    
+        <script type="text/javascript">
+          let calendarEl = document.getElementById('calendar');
+          let calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: [
+              {% for event in events %}
+              {
+                title: '{{event.title}} {{event.id}}',
+                start: '{{event.start}}',
+                end: '{{event.end}}',
+                color: '{{event.color}}'
+              },
+              {% endfor %}
+            ]
+          });
+          calendar.render();
+        </script>
+    </div>
+    {%endif%}   
+    </div>
+    
+
+    <style type="text/css">
+        .levelone
+        {
+            display: flex;
+            flex-direction: row;   
+        }
+        .float-container {
+            border: 3px solid #fff;
+            padding: 20px;
+        }
+        
+        .float-child {
+            float: left;
+            padding: 10px;
+            padding-left: 20px;
+            
+        }
+        label {
+            font-weight: normal;
+        }
+
+        .class-calendar {
+            width: 100%;
+            margin: 0 auto;
+        }
+        </style>
+        
+   
+  {% endblock %}
+
+
+

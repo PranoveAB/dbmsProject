@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Welcome {{username}}!</h1>
+  <a href="/logout" class="btn btn-primary btn-lg">Logout</a>
+  <a href="/addPatient" class="btn btn-primary btn-lg">Add new Patient</a>
+  <a href="/addDoctor" class="btn btn-primary btn-lg">Add new Doctor</a>
+  <a href="/listPatients" class="btn btn-primary btn-lg">List Patients</a>
+  <a href="/listDoctors" class="btn btn-primary btn-lg">List Doctors</a>
+{% endblock %}

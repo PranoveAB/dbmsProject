@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+{% if session.user_role == "admin" %}
+<a href="/addPatient" class="btn btn-primary btn-lg">Add new Patient</a>
+{% endif %}
+  <h1>List of Patients</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">MRN</th>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Phone Number</th>
+        <th scope="col">Email</th>
+        <th scope="col">Date of Birth</th>
+        <th scope="col">Address</th>
+        </tr>
+    </thead>
+    <tbody>
+      {% for patient in patients %}
+      <tr>
+        <td>
+           <a href="/patient/{{patient.mrn}}"> {{patient.mrn}} </a>
+        </td>
+        <td>{{patient.patient_first_name}}</td>
+        <td>{{patient.patient_last_name}}</td>
+        <td>{{patient.patient_phone}}</td>
+        <td>{{patient.patient_email}}</td>
+        <td>{{patient.patient_dob}}</td>
+        <td>{{patient.street_name+", "+patient.city+", "+patient.state+" - "+patient.zip}}</td>
+        <td>
+            <div class="buttons">
+                {% if session.user_role == "admin" %}
+                <form method="POST" action="/deletePatient/{{patient.mrn}}">
+                    <button type="submit" class="btn btn-danger btn-sm" id={{patient.mrn}}>Delete</button>
+                </form>
+                {% endif %}
+            </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    </table>
+
+    <style>
+        .buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    </style>
+{% endblock %}

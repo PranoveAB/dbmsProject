@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Add New Doctor</h1>
+  {% from "includes/_formhelpers.html" import render_field %}
+  <form method="POST" action="" style="position: relative; left: 30%; width: 40%;">
+    <h2>Basic Details</h2>
+    <div class="form-group">
+      {{render_field(form.firstName, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.lastName, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.dateOfBirth, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.sex, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.phone, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.email, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.password, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.joiningDate, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.specialization, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.bloodGroup, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.ssn, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.streetName, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.city, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.state, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.country, class_="form-control")}}
+    </div>
+    <div class="form-group">
+        {{render_field(form.zipCode, class_="form-control")}}
+    </div>
+    <br>
+    <p><input type="submit" class="btn btn-primary" value="Add Doctor"></p>
+  </form>
+
+  <style>
+    .form-group {
+      margin-bottom: 10px;
+      width: 50ch;
+    }
+   </style>
+{% endblock %}
