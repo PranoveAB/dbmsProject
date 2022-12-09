@@ -1,10 +1,44 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-  <h1>Welcome {{username}}!</h1>
-  <a href="/logout" class="btn btn-primary btn-lg">Logout</a>
-  <a href="/addPatient" class="btn btn-primary btn-lg">Add new Patient</a>
-  <a href="/addDoctor" class="btn btn-primary btn-lg">Add new Doctor</a>
-  <a href="/listPatients" class="btn btn-primary btn-lg">List Patients</a>
-  <a href="/listDoctors" class="btn btn-primary btn-lg">List Doctors</a>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+  <h1>Welcome {{data.admin_first_name}} {{data.admin_last_name}}!</h1>
+
+<!-- code to display doctor basic details -->
+
+    <div class = "float-container">
+        <div class="levelone">
+            <div class = "float-child">
+                <h2>Doctor Details</h2>
+                <p>First Name: {{data.admin_first_name}}</p>
+                <p>Last Name: {{data.admin_last_name}}</p>
+                <p>Email: {{data.email}}</p>
+                <p>Phone: {{data.phone}}</p>
+            </div>
+            <div class = "float-child">
+                <h2>Residential Address</h2>
+                <p>Address: {{data.street_name}}</p>
+                <p>City: {{data.city}}</p>
+                <p>State: {{data.state}}</p>
+                <p>Zip: {{data.zip}}</p>
+            </div>
+        </div>
+    </div>
+
+  <style>
+    .float-container {
+      overflow: hidden;
+    }
+    .float-child {
+      float: left;
+      width: 50%;
+      padding: 10px;
+    }
+    .levelone {
+      width: 100%;
+    }
+  </style>
+
 {% endblock %}

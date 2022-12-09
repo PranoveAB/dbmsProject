@@ -3,47 +3,54 @@ import pymysql
 from wtforms import Form, StringField,PasswordField, validators, DateTimeLocalField
 from passlib.hash import sha256_crypt
 from functools import wraps
-from adminForms import AddPatientForm, AddDoctorForm, AddBillForm, AddPaymentForm
-from doctorForm import AddMedicalRecord, AddTreatment, AddMedication
+from adminForms import AddPatientForm, AddDoctorForm, AddBillForm, AddPaymentForm, AddAdminForm
+from doctorForm import AddMedicalRecord, AddTreatment, AddMedication, CreateAppointmentForm, InsuranceForm
 
 app = Flask(__name__)
 
 # Config MySQL
 
-# mysql = pymysql.connect(host='localhost', user='root', password='Pranove*2', db='dbmsproj', cursorclass=pymysql.cursors.DictCursor)
-mysql = pymysql.connect(host='localhost', user='root', password='Pranove*2', db='hmsnonprod', cursorclass=pymysql.cursors.DictCursor)
-
+mysql = pymysql.connect(host='localhost',
+                        user='root', 
+                        password='Pranove*2',
+                        db='finaldump',
+                        cursorclass=pymysql.cursors.DictCursor
+                        )
 
 # Index
 @app.route('/')
 def index():
     return render_template('home.html')
 
-# Register Form Class
-class RegisterForm(Form):
-    username = StringField('Username', [validators.Length(min=4, max=25)])
-    password = PasswordField('Password', [
-        validators.DataRequired(),
-        validators.EqualTo('confirm', message='Passwords do not match')
-    ])
-    confirm = PasswordField('Confirm Password')
 
 # User Register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm(request.form)
-    if request.method == 'POST' and form.validate():
+    form = AddAdminForm(request.form)
 
-        username = form.username.data
+    if request.method == 'POST':
+
+
+        fname = form.firstName.data
+        lname = form.lastName.data
+        phone = form.phone.data
+        dob = form.dateOfBirth.data
+        sex = form.sex.data
+        bloodGroup = form.bloodGroup.data
+        ssn = form.ssn.data
+        country = form.country.data
+        state = form.state.data
+        city = form.city.data
+        street = form.streetName.data
+        zipCode = form.zipCode.data
+        username = form.email.data
         password = sha256_crypt.hash(str(form.password.data))
         userRole = 'admin'
-
+        
         # Create cursor
         cur = mysql.cursor()
-
-        # Execute query
-        cur.execute("INSERT INTO user(userName, pwd,user_role) VALUES(%s, %s, %s)", ( username, password, userRole))
-
+        cur.callproc('addAdmin', (fname, lname,phone, username,dob,sex,bloodGroup,ssn,country,state,city,street,zipCode,password,userRole))
+    
         # Commit to DB
         mysql.commit()
         # Close connection
@@ -51,7 +58,7 @@ def register():
 
         flash('You are now registered and can log in', 'success')
 
-        return redirect(url_for(''))
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 
@@ -120,13 +127,6 @@ def logout():
     session.clear()
     flash('You are now logged out', 'success')
     return redirect(url_for('login'))
-
-class RegisterForm1(Form):
-        policy_no = StringField('Policy No:', [validators.Length(min=4, max=25)],)
-        company_name = StringField('Company Name:', [validators.Length(min=4, max=25)])
-        sum_insured = StringField('Sum Insured:', [validators.Length(min=4, max=25)])
-        policy_start_date = StringField('Policy Start Date:', [validators.Length(min=4, max=25)])
-        policy_end_date = StringField('Policy End Date:', [validators.Length(min=4, max=25)])
 
 # Patient Dashboard
 
@@ -205,8 +205,6 @@ def patientById(mrn):
             cur.execute("select * from bill where bill_id = (select bill_no from patientbill where patient_num = %s)", (mrn))
             data = cur.fetchone()
             if data is None:
-                # cur.execute("insert into bill(total_cost, bill_date) values(%s, %s)", (billAmount, billDate, mrn))
-                # cur.execute("insert into patientbill(patient_num, bill_no) values(%s, (select bill_id from bill where total_cost = %s and bill_date = %s))", (mrn, billAmount, billDate))
                 cur.callproc('AddPatientBill', (mrn, billDate, billAmount))
                 mysql.commit()
                 cur.close()
@@ -243,20 +241,17 @@ def patientById(mrn):
 
     if session['user_role'] == 'doctor' or session['user_role'] == 'patient':
         cur = mysql.cursor()
-        # cur.execute("select p.*,a.*,i.*,r.* from patient p join address a on p.addr_id=a.addr_id join MedicalInsurance i on p.insurance_id=i.insurance_id join MedicalRecord r on p.med_record_id = r.med_record_id where p.mrn = %s", [mrn])
-        #cur.execute("select p.*,i.*,r.*,d.*, m.* from patient p join address a on p.addr_id=a.addr_id join MedicalInsurance i on p.insurance_id=i.insurance_id join appointment app on p.mrn = app.patient_id join MedicalRecord r on p.med_record_id = r.med_record_id join diagnosisAndTreatment d on d.app_id = app.app_id join medication m on d.medicineId = m.medicineId where p.mrn = %s", [mrn])
+        
         # A patient might not have an appointment yet
         cur.execute("select p.*,i.*,r.*,d.*, m.*, a.* from patient p join address a on p.addr_id=a.addr_id join MedicalInsurance i on p.insurance_id=i.insurance_id left join appointment app on p.mrn = app.patient_id left join MedicalRecord r on p.med_record_id = r.med_record_id left join diagnosisAndTreatment d on d.patient_mrn = p.mrn left join medication m on p.mrn = m.patient_mrn where p.mrn = %s", [mrn])
-        # cur.execute("select p.*,i.*,r.*, a.* from patient p join address a on p.addr_id=a.addr_id join MedicalInsurance i on p.insurance_id=i.insurance_id join MedicalRecord r on p.med_record_id = r.med_record_id where p.mrn = %s", [mrn])
-        # cur.execute(" select a.*, p.*, d.first_name, d.last_name from appointment a join patient p on a.patient_id = p.mrn join doctor d on d.doc_id = a.doc_id where d.email = %s", [session['username']])
+        
         patientData = cur.fetchone()
-        # print(patientData)
+        cur.close()
         medicalRecord.description.data = patientData['Med_rec_des']
         medicalRecord.allergies.data = patientData['allergy']
         if patientData['follow_up'] is None:
             medicalRecord.nextFollowUp.data = ''
         medicalRecord.nextFollowUp.data = patientData['follow_up']
-        #print(patientData['follow_up'])
         treatment.diagnosis.data = patientData['diag_desc'] 
         treatment.treatmentName.data = patientData['treat_name']
         treatment.treatmentDescription.data = patientData['treat_desc']
@@ -272,7 +267,7 @@ def patientById(mrn):
         # cur.execute("select p.*,a.*,i.*,r.*,b.* from patient p join address a on p.addr_id=a.addr_id join bill b on (select bill_no from patientbill where patient_num = %s) join payment pay on pay.bill_id = b.bill_id join MedicalInsurance i on p.insurance_id=i.insurance_id join MedicalRecord r on p.med_record_id = r.med_record_id where p.mrn = %s", [mrn,mrn])
         cur.execute("select r.*,i.*,p.*, a.*, b.*, pay.* from patient p join address a on p.addr_id = a.addr_id join medicalInsurance i on p.insurance_id = i.insurance_id join medicalRecord r on p.med_record_id = r.med_record_id left join patientbill pb on p.mrn = pb.patient_num left join bill b on b.bill_id = pb.bill_no left join payment pay on pay.bill_id = b.bill_id where p.mrn = %s", [mrn])
         patientData = cur.fetchone()
-        print(patientData)
+        cur.close()
 
         patientBill.billDate.data= patientData['bill_date']
         patientBill.billAmount.data = patientData['total_cost']
@@ -282,7 +277,6 @@ def patientById(mrn):
 
     return render_template('patient/patient.html',patientData=patientData, medicalRecord=medicalRecord, treatment=treatment, medication=medication,form=medicalRecord,patientBill=patientBill,patientPayment=patientPayment)
     
-
 
 @app.route('/patient', methods=['GET', 'POST'])
 @is_logged_in
@@ -326,8 +320,7 @@ def patient():
     # cur.execute("select p.*,a.*,i.*,r.*,d.*, m.* from patient p join address a on p.addr_id=a.addr_id join MedicalInsurance i on p.insurance_id=i.insurance_id join appointment app on p.mrn = app.patient_id join MedicalRecord r on p.med_record_id = r.med_record_id join diagnosisAndTreatment d on d.app_id = app.app_id join medication m on d.medicineId = m.medicineId join user u on p.patient_email = u.userName where u.userName = %s", [username])
     
     patientData = cur.fetchone()
-    # print(patientData)
-    form1 = RegisterForm1(request.form)
+    form1 = InsuranceForm(request.form)
     form1.policy_no.data = patientData['policy_no']
     form1.company_name.data = patientData['company_name']
     form1.sum_insured.data = patientData['sum_insured']
@@ -395,14 +388,20 @@ def doctor():
     return render_template('doctor/doctor.html',data=data,addr=addr, events=events)
 
 # Admin Dashboard
-
+# works
 @app.route('/admin')
 @is_logged_in
 def admin():
-    # return "Admin Dashboard"
-    username = session['username']
 
-    return render_template('admin/admin.html',username=username)
+    cur = mysql.cursor()
+    cur.execute(
+       "select ad.*,a.* from adminstaff ad join address a on ad.addr_id = a.addr_id where ad.email = %s", [session['username']]
+       )
+    data = cur.fetchone()
+    cur.close()
+
+    # return "Admin Dashboard"
+    return render_template('admin/admin.html',data=data)
 
 
 
@@ -480,11 +479,6 @@ def addDoctor():
     return render_template("admin/createDoctor.html",form=newDoctor)
 
 # works
-class CreateAppointmentForm(Form):
-    date_time = DateTimeLocalField('Appointment Date and Time:', format='%Y-%m-%dT%H:%M')
-    doctorName = StringField('Doctor Name:', [validators.Length(min=4, max=25)])
-
-# works
 @app.route('/add', methods=['GET', "POST"])
 @is_logged_in
 def add():
@@ -494,10 +488,11 @@ def add():
         doctorFirstName = appointmentform.doctorName.data.split()[0]
         doctorLastName = appointmentform.doctorName.data.split()[1]
         patientEmail = session['username']
-
+        print(patientEmail, doctorFirstName, doctorLastName,appointmentDate)
         cur = mysql.cursor()
         cur.callproc('AddAppointment', (patientEmail, doctorFirstName, doctorLastName,appointmentDate ))
         mysql.commit()
+        cur.close()
         flash('Appointment created', 'success')
         return redirect(url_for('patient'))
     return render_template("patient/createAppointment.html",form=appointmentform)
@@ -510,7 +505,6 @@ def listDoctors():
     resultValue = cur.execute("select d.*, a.country, a.state, a.city, a.street_name, a.zip from doctor d join address a on d.addr_id = a.addr_id")
     doctors = cur.fetchall()
     cur.close()
-    # print(doctors)
     if resultValue > 0:
         return render_template('admin/doctors.html', doctors=doctors)
     else:
@@ -524,9 +518,7 @@ def listPatients():
 
     if session['user_role'] == 'doctor':
         cur = mysql.cursor()
-        # resultValue = cur.execute("select p.*, a.country, a.state, a.city, a.street_name, a.zip from patient p join address a on p.addr_id = a.addr_id join appointment ap on p.mrn = ap.patient_id where ap.doc_id = (select doc_id from doctor where first_name = %s)", [session['username']])
         resultValue = cur.execute("select distinct p.*,a.* from patient p join address a on p.addr_id = a.addr_id join appointment ap on p.mrn = ap.patient_id where ap.doc_id = (select doc_id from doctor where email = %s)", [session['username']])
-        # resultValue = cur.execute("select p.*,a.* from patient p join address a on p.addr_id = a.addr_id")
         patients = cur.fetchall()
         cur.close()
     elif session['user_role'] == 'admin':

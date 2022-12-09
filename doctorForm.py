@@ -1,4 +1,4 @@
-from wtforms import Form, StringField, validators, IntegerField, TextAreaField, DateField
+from wtforms import Form, StringField, validators, IntegerField, TextAreaField, DateField, DateTimeLocalField
 
 
 class AddMedicalRecord(Form):
@@ -18,3 +18,15 @@ class AddMedication(Form):
     medicationDuration = StringField('Medication Duration', [validators.Length(min=1, max=50)])
     refills = IntegerField('Refills', [validators.NumberRange(min=0, max=10)])
     medicationCost = IntegerField('Medication Cost', [validators.NumberRange(min=0, max=100000)])
+
+# works
+class CreateAppointmentForm(Form):
+    date_time = DateTimeLocalField('Appointment Date and Time:', format='%Y-%m-%dT%H:%M')
+    doctorName = StringField('Doctor First and Last Name:', [validators.Length(min=4, max=25)])
+
+class InsuranceForm(Form):
+    policy_no = StringField('Policy No:', [validators.Length(min=4, max=25)],)
+    company_name = StringField('Company Name:', [validators.Length(min=4, max=25)])
+    sum_insured = StringField('Sum Insured:', [validators.Length(min=4, max=25)])
+    policy_start_date = StringField('Policy Start Date:', [validators.Length(min=4, max=25)])
+    policy_end_date = StringField('Policy End Date:', [validators.Length(min=4, max=25)])

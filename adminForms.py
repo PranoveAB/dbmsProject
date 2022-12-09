@@ -3,6 +3,14 @@
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators, FloatField, DateField, IntegerField
 
 
+class RegisterForm(Form):
+    username = StringField('Username', [validators.Length(min=4, max=25)])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message='Passwords do not match')
+    ])
+    confirm = PasswordField('Confirm Password')
+
 class AddPatientForm(Form):
     firstName = StringField('First Name', [validators.Length(min=1, max=200),validators.DataRequired()])
     lastName = StringField('Last Name', [validators.Length(min=1, max=200),validators.DataRequired()])
@@ -41,7 +49,7 @@ class AddDoctorForm(Form):
     password = PasswordField('Password', [validators.Length(min=8, max=15),validators.DataRequired()])
     specialization = StringField('Specialization', [validators.Length(min=1, max=200)])
     bloodGroup = StringField('Blood Group', [validators.Length(min=1, max=10)])
-    ssn = StringField('SSN', [validators.Length(min=1, max=20)])
+    ssn = StringField('SSN', [validators.Length(min=1, max=9)])
 
 
 class AddBillForm(Form):
@@ -52,3 +60,20 @@ class AddPaymentForm(Form):
     paymentDate = DateField('Payment Date', format='%Y-%m-%d', validators=[validators.DataRequired()])
     paymentStatus = StringField('Payment Status', [validators.Length(min=1, max=200)])
     paymentMethod = StringField('Payment Method', [validators.Length(min=1, max=200)])
+
+class AddAdminForm(Form):
+    firstName = StringField('First Name', [validators.Length(min=1, max=200)])
+    lastName = StringField('Last Name', [validators.Length(min=1, max=200)])
+    dateOfBirth = DateField('Date of Birth', format='%Y-%m-%d', validators=[validators.DataRequired()])
+    phone = StringField('Phone', [validators.Length(min=1, max=20)])
+    email = StringField('Email', [validators.Length(min=1, max=200)])
+    password = PasswordField('Password', [validators.Length(min=8, max=15),validators.DataRequired()])
+    dateOfBirth = DateField('Date of Birth', format='%Y-%m-%d', validators=[validators.DataRequired()])
+    sex = StringField('Sex', [validators.Length(min=1, max=1)])
+    ssn = StringField('SSN', [validators.Length(min=1, max=9)])
+    city = StringField('City', [validators.Length(min=1, max=200)])
+    streetName = StringField('Street Name', [validators.Length(min=1, max=200)])
+    state = StringField('State', [validators.Length(min=1, max=200)])
+    country = StringField('Country', [validators.Length(min=1, max=200)])
+    zipCode = IntegerField('Zip Code', [validators.Length(min=1, max=200)])
+    bloodGroup = StringField('Blood Group', [validators.Length(min=1, max=10)])
